@@ -10,6 +10,8 @@ Quran_Tajwid.pdf
 Quran_Daily_Page.json
 # C extensions
 *.so
+*.pem
+*.key
 Secret Files
 database_log*.txt
 # Distribution / packaging
