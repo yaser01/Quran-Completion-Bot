@@ -39,7 +39,7 @@ from Packges.MainMenu.new_khatma import new_khatma_confirmation_pressed, new_kha
     new_khatma_type_pressed
 from Packges.MainMenu.view_khatma import show_khatma_info, khatma_refresh_pressed, khatma_part_pressed
 from Packges.Schedule_Jobs import check_booked_parts_deadline, check_booked_parts_next_notification, \
-    upload_daily_quran_page_to_channel, upload_quran_files
+    upload_daily_quran_page_to_channel, upload_quran_files, backup_database_daily
 from Startup.CallBackData import CallBackData
 from Startup.Keyboards import Keyboards
 from Startup.KhatmaStatus import KhatmaStatus
@@ -463,6 +463,9 @@ def main():
                                                                        interval=60, first=10)
     job_upload_daily_quran_page_to_channel = job_queue.run_daily(upload_daily_quran_page_to_channel,
                                                                  datetime.time(hour=8, minute=0,
+                                                                               tzinfo=pytz.timezone('Asia/Baghdad')))
+    job_upload_daily_backup_to_drive = job_queue.run_daily(backup_database_daily,
+                                                                 datetime.time(hour=9, minute=0,
                                                                                tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=1)
     application.run_webhook(webhook_url=WEBHOOK_URL, listen=WEBHOOK_LISTEN_HOST, port=WEBHOOK_LISTEN_PORT)

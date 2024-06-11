@@ -55,22 +55,6 @@ async def check_booked_parts_next_notification(context: ContextTypes.DEFAULT_TYP
 
 
 async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
-    for i in range(1, 31):
-        db_chapter_no = db.calc_file_id_with_chapter_no(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs.value)
-        if await db.get_quran_chapter_link(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs.value) is None:
-            chapter = os.path.join(Quran_Hafs_Chapters_Folder, f"{i}.pdf")
-            chapter_file_caption = Text.get_quran_chapter_file_description(chapter_no=i,
-                                                                           book_id=QURAN_BOOK_ID.Hafs.value)
-            file_name = part_no_dict[i]
-            file_name += " برواية حفص عن عاصم"
-            file_name += ".pdf"
-            message = await context.bot.send_document(chat_id=QURAN_FILES_CHANNEL_ID, document=open(chapter, "rb"),
-                                                      filename=file_name, caption=chapter_file_caption)
-            await db.update_quran_file_link(file_id=db_chapter_no, telegram_file_id=message.document.file_id)
-            logging.warning(
-                f"Update Quran Chapter ({QURAN_BOOK_ID.Hafs.name},{i}) Telegram File Id: {message.document.file_id}")
-        else:
-            logging.warning(f"Quran Chapter ({QURAN_BOOK_ID.Hafs.name},{i}) is already on DB.")
     for i in range(1, 605):
         db_page_no = db.calc_file_id_with_page_no(page_no=i, book_id=QURAN_BOOK_ID.Hafs.value)
         if await db.get_quran_page_link(page_no=i, book_id=QURAN_BOOK_ID.Hafs.value) is None:
@@ -94,7 +78,22 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
         else:
             logging.warning(f"Quran Page ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) is already on DB.")
 
-
+    for i in range(1, 31):
+        db_chapter_no = db.calc_file_id_with_chapter_no(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs.value)
+        if await db.get_quran_chapter_link(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs.value) is None:
+            chapter = os.path.join(Quran_Hafs_Chapters_Folder, f"{i}.pdf")
+            chapter_file_caption = Text.get_quran_chapter_file_description(chapter_no=i,
+                                                                           book_id=QURAN_BOOK_ID.Hafs.value)
+            file_name = part_no_dict[i]
+            file_name += " برواية حفص عن عاصم"
+            file_name += ".pdf"
+            message = await context.bot.send_document(chat_id=QURAN_FILES_CHANNEL_ID, document=open(chapter, "rb"),
+                                                      filename=file_name, caption=chapter_file_caption)
+            await db.update_quran_file_link(file_id=db_chapter_no, telegram_file_id=message.document.file_id)
+            logging.warning(
+                f"Update Quran Chapter ({QURAN_BOOK_ID.Hafs.name},{i}) Telegram File Id: {message.document.file_id}")
+        else:
+            logging.warning(f"Quran Chapter ({QURAN_BOOK_ID.Hafs.name},{i}) is already on DB.")
 
     for i in range(1, 31):
         db_chapter_no = db.calc_file_id_with_chapter_no(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs_with_tajwid.value)
@@ -125,3 +124,7 @@ async def upload_daily_quran_page_to_channel(context: ContextTypes.DEFAULT_TYPE)
         photo=page_file_id,
         caption=browse_quran_by_page_no_page_text)
     set_next_page_no_daily_page_quran()
+
+
+async def backup_database_daily(context: ContextTypes.DEFAULT_TYPE):
+    db.add_backup_request()
