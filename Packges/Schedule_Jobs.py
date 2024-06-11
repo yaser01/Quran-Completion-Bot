@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os.path
 from datetime import datetime
@@ -63,6 +64,7 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await db.update_quran_file_link(file_id=db_page_no, telegram_file_id=message.photo[-1].file_id)
             logging.warning(
                 f"Update Quran Page ({QURAN_BOOK_ID.Hafs.name},{i}) Telegram File Id: {message.photo[-1].file_id}")
+            await asyncio.sleep(10)
         else:
             logging.warning(f"Quran Page ({QURAN_BOOK_ID.Hafs.name},{i}) is already on DB.")
 
@@ -75,6 +77,7 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await db.update_quran_file_link(file_id=db_page_no, telegram_file_id=message.photo[-1].file_id)
             logging.warning(
                 f"Update Quran Page ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) Telegram File Id: {message.photo[-1].file_id}")
+            await asyncio.sleep(10)
         else:
             logging.warning(f"Quran Page ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) is already on DB.")
 
@@ -92,6 +95,7 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await db.update_quran_file_link(file_id=db_chapter_no, telegram_file_id=message.document.file_id)
             logging.warning(
                 f"Update Quran Chapter ({QURAN_BOOK_ID.Hafs.name},{i}) Telegram File Id: {message.document.file_id}")
+            await asyncio.sleep(10)
         else:
             logging.warning(f"Quran Chapter ({QURAN_BOOK_ID.Hafs.name},{i}) is already on DB.")
 
@@ -109,6 +113,7 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await db.update_quran_file_link(file_id=db_chapter_no, telegram_file_id=message.document.file_id)
             logging.warning(
                 f"Update Quran Chapter ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) Telegram File Id: {message.document.file_id}")
+            await asyncio.sleep(10)
         else:
             logging.warning(f"Quran Chapter ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) is already on DB.")
 
