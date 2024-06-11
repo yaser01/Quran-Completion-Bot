@@ -893,7 +893,7 @@ class Text:
         text += part_no_dict_in_details[chapter_no][:part_no_dict_in_details[chapter_no].rindex(" ")]
         text += "\n"
         if book_id == QURAN_BOOK_ID.Hafs.value:
-            text += "📖 مصحف حفص عن عاصم."
+            text += "📖 المصحف برواية حفص عن عاصم."
         elif book_id == QURAN_BOOK_ID.Hafs_with_tajwid.value:
             text += "📖 مصحف التجويد برواية حفص عن عاصم."
         return text
@@ -906,7 +906,7 @@ class Text:
         text += part_no_dict_in_details[chapter_no][:part_no_dict_in_details[chapter_no].rindex(" ")]
         text += " من "
         if book_id == QURAN_BOOK_ID.Hafs.value:
-            text += "مصحف حفص عن عاصم."
+            text += "المصحف برواية حفص عن عاصم."
         elif book_id == QURAN_BOOK_ID.Hafs_with_tajwid.value:
             text += "مصحف التجويد برواية حفص عن عاصم."
         return text
@@ -916,7 +916,7 @@ class Text:
         book_id = int(book_id)
         text = ""
         if book_id == QURAN_BOOK_ID.Hafs.value:
-            text += "مصحف حفص عن عاصم."
+            text += "المصحف  برواية حفص عن عاصم."
         elif book_id == QURAN_BOOK_ID.Hafs_with_tajwid.value:
             text += "مصحف التجويد برواية حفص عن عاصم."
         return text
@@ -930,7 +930,7 @@ class Text:
         text += " صفحة"
         text += " من القرآن الكريم\n"
         if book_id == QURAN_BOOK_ID.Hafs.value:
-            text += "📖 مصحف حفص عن عاصم."
+            text += "📖 المصحف  برواية حفص عن عاصم."
         elif book_id == QURAN_BOOK_ID.Hafs_with_tajwid.value:
             text += "📖 مصحف التجويد برواية حفص عن عاصم."
         return text
@@ -939,7 +939,7 @@ class Text:
     def get_quran_description_by_book_id(book_id):
         text = "تصفح القرآن الكريم بالمصحف التالي:\n"
         if book_id == QURAN_BOOK_ID.Hafs.value:
-            text += "📖 مصحف حفص عن عاصم."
+            text += "📖 المصحف برواية حفص عن عاصم."
         elif book_id == QURAN_BOOK_ID.Hafs_with_tajwid.value:
             text += "📖 مصحف التجويد برواية حفص عن عاصم."
         return text
