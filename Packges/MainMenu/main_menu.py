@@ -60,6 +60,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if is_blocked:
         await context.bot.send_message(chat_id=chat_id, text=Text.Blocked_User)
         return
+    welcome_message=Text.get_welcome_by_user_message(telegram_user=telegram_user)
     keyboard = InlineKeyboardMarkup(Keyboards.get_main_inline_keyboard())
-    await update.message.reply_text(text=Text.Welcome, reply_markup=keyboard)
+    await update.message.reply_text(text=welcome_message, reply_markup=keyboard,parse_mode="HTML")
     await delete_old_khatma_opening_request(chat_id, context)

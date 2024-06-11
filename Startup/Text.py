@@ -1,3 +1,4 @@
+from html import escape
 from typing import List
 
 from telegram.helpers import mention_html
@@ -920,6 +921,7 @@ class Text:
         elif book_id == QURAN_BOOK_ID.Hafs_with_tajwid.value:
             text += "مصحف التجويد برواية حفص عن عاصم."
         return text
+
     @staticmethod
     def get_quran_page_description_by_page_no(book_id, page_no):
         book_id = int(book_id)
@@ -942,6 +944,19 @@ class Text:
             text += "📖 المصحف برواية حفص عن عاصم."
         elif book_id == QURAN_BOOK_ID.Hafs_with_tajwid.value:
             text += "📖 مصحف التجويد برواية حفص عن عاصم."
+        return text
+
+    @staticmethod
+    def get_welcome_by_user_message(telegram_user):
+        text = "مرحباً بك "
+        mention_string = f'<a href="tg://user?id={telegram_user.id}">{escape(telegram_user.fullname)}</a>'
+        text += mention_string
+        text += escape(" ☺️")
+        text += "\n"
+        text += "في بوت ختمات القرآن الكريم"
+        text += escape(" 📖")
+        text += "."
+        print(text)
         return text
 
     Welcome = "مرحباً بك في بوت ختمات القرآن"
