@@ -4,6 +4,7 @@ import logging
 import os
 
 import pytz
+import telegram
 from dotenv import load_dotenv
 from telegram import Update, InlineKeyboardMarkup
 from telegram.constants import ChatType, ParseMode
@@ -51,6 +52,9 @@ BOT_TOKEN = os.getenv('BOT_TOKEN')
 WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 WEBHOOK_LISTEN_HOST = os.getenv('WEBHOOK_LISTEN_HOST')
 WEBHOOK_LISTEN_PORT = os.getenv('WEBHOOK_LISTEN_PORT')
+SECRET_TOKEN = os.getenv('SECRET_TOKEN')
+PRIVATE_KEY = os.getenv('PRIVATE_KEY')
+CERT = os.getenv('CERT')
 
 
 async def nothing_pressed(update: Update, context: CallbackContext) -> None:
@@ -468,7 +472,14 @@ def main():
                                                                  datetime.time(hour=9, minute=0,
                                                                                tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=1)
-    application.run_webhook(webhook_url=WEBHOOK_URL, listen=WEBHOOK_LISTEN_HOST, port=WEBHOOK_LISTEN_PORT)
+    application.run_webhook(
+        listen=WEBHOOK_LISTEN_HOST,
+        port=WEBHOOK_LISTEN_PORT,
+        secret_token=SECRET_TOKEN,
+        key=PRIVATE_KEY,
+        cert=CERT,
+        webhook_url=WEBHOOK_URL
+    )
 
 
 def setup_startup_files():
@@ -477,7 +488,6 @@ def setup_startup_files():
         with open(Daily_Page_Quran_File, "a+", encoding="UTF-8") as f:
             data["page_no"] = 1
             json.dump(data, f)
-
 
 if __name__ == "__main__":
     logging.getLogger('apscheduler.executors.default').setLevel(logging.WARNING)
