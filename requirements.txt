@@ -1,0 +1,13 @@
+python-dotenv~=1.0.1
+SQLAlchemy~=2.0.30
+pytz
+python-telegram-bot
+python-telegram-bot[job-queue]
+python-telegram-bot[webhooks]
+sqlalchemy_utils
+asyncpg
+psycopg2
+sqladmin
+fastapi
+google-api-python-client
+google_auth_oauthlib
