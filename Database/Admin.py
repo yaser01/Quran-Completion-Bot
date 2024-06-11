@@ -2,7 +2,9 @@ import sys
 
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
+from sqladmin.authentication import AuthenticationBackend
 from sqlalchemy.ext.asyncio import create_async_engine
+from starlette.requests import Request
 
 sys.path.append('../')
 from Database.db import DATABASE_URI
@@ -11,7 +13,39 @@ from Packges.Global_Functions import build_async_db_uri
 
 async_engine = create_async_engine(build_async_db_uri(DATABASE_URI), echo=False)
 app = FastAPI()
-admin = Admin(app, async_engine)
+Admin_Password = "*"
+
+
+class AdminAuth(AuthenticationBackend):
+    async def login(self, request: Request) -> bool:
+        form = await request.form()
+        username, password = form["username"], form["password"]
+
+        if username == "Admin" and password == Admin_Password:
+            request.session.update({"token": "..."})
+            return True
+        else:
+            request.session.clear()
+            return False
+
+    async def logout(self, request: Request) -> bool:
+        # Usually you'd want to just clear the session
+        request.session.clear()
+        return True
+
+    async def authenticate(self, request: Request) -> bool:
+        token = request.session.get("token")
+
+        if not token:
+            return False
+
+        # Check the token in depth
+        return True
+
+
+authentication_backend = AdminAuth(secret_key="...")
+
+admin = Admin(app, engine, authentication_backend=authentication_backend)
 
 
 class UserAdmin(ModelView, model=User):
