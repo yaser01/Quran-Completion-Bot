@@ -7,9 +7,11 @@ __pycache__/
 *$py.class
 Quran_Hafs.pdf
 Quran_Tajwid.pdf
+Quran_Daily_Page.json
 # C extensions
 *.so
 Secret Files
+database_log*.txt
 # Distribution / packaging
 .Python
 build/

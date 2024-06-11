@@ -1,5 +1,7 @@
+import os
 import sys
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from sqladmin import Admin, ModelView
 from sqladmin.authentication import AuthenticationBackend
@@ -10,12 +12,13 @@ sys.path.append('../')
 from Database.db import DATABASE_URI
 from Database.models import User, Khatma, Khatma_Done, Khatma_Parts, Khatma_Parts_Done, Quran_File
 from Packges.Global_Functions import build_async_db_uri
+import sys
 
+sys.path.append('../')  # add ability to import modules from parent folder
 async_engine = create_async_engine(build_async_db_uri(DATABASE_URI), echo=False)
 app = FastAPI()
-Admin_Password = "*"
-
-
+load_dotenv()
+Admin_Password = os.getenv('ADMIN_PAGE_PASSWORD')
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
