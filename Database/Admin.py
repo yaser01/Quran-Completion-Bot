@@ -48,7 +48,7 @@ class AdminAuth(AuthenticationBackend):
 
 authentication_backend = AdminAuth(secret_key="...")
 
-admin = Admin(app, engine, authentication_backend=authentication_backend)
+admin = Admin(app, async_engine, authentication_backend=authentication_backend)
 
 
 class UserAdmin(ModelView, model=User):
