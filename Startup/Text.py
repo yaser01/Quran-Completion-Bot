@@ -956,7 +956,6 @@ class Text:
         text += "في بوت ختمات القرآن الكريم"
         text += escape(" 📖")
         text += "."
-        print(text)
         return text
 
     Welcome = "مرحباً بك في بوت ختمات القرآن"
