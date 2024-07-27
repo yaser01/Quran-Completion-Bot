@@ -8,7 +8,7 @@ from telegram.ext import ContextTypes
 
 from Database import db
 from Startup.Global_Files import Quran_Hafs_Pages_Images_Folder, Quran_Hafs_Tajwid_Pages_Images_Folder, \
-    Quran_Hafs_Chapters_Folder, Quran_Hafs_Tajwid_Chapters_Folder
+    Quran_Hafs_Chapters_Folder, Quran_Hafs_Tajwid_Chapters_Folder, Resources_Folder
 from Packges.Global_Functions import QURAN_BOOK_ID, get_current_page_no_daily_page_quran, \
     set_next_page_no_daily_page_quran
 from Startup.Keyboards import part_no_dict
@@ -116,6 +116,13 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(4.5)
         else:
             logging.warning(f"Quran Chapter ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) is already on DB.")
+    await upload_about_image(context)
+
+
+async def upload_about_image(context):
+    about_image = os.path.join(Resources_Folder, "about.jpg")
+    message = await context.bot.send_photo(chat_id=QURAN_FILES_CHANNEL_ID, photo=open(about_image, "rb"))
+    print(message.photo[-1].file_id)
 
 
 async def upload_daily_quran_page_to_channel(context: ContextTypes.DEFAULT_TYPE):
