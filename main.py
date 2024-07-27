@@ -318,7 +318,7 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             khatma_info_request_message_text = Text.Please_Enter_Duration_In_Days
             khatma_info_request_message_text += "\n"
             khatma_info_request_message_text += Text.Please_Enter_Not_Big_Duration_Number
-            await context.bot.send_message(chat_id=chat_id,text=khatma_info_request_message_text)
+            await context.bot.send_message(chat_id=chat_id, text=khatma_info_request_message_text)
             return
         reading_part_duration = int(reading_part_duration)
         khatma_id = int(context.user_data["khatma_id"])
@@ -488,7 +488,7 @@ def main():
                                                            datetime.time(hour=9, minute=0,
                                                                          tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=1)
-    job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7,first=2)
+    job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, first=2)
     application.run_webhook(
         listen=WEBHOOK_LISTEN_HOST,
         port=WEBHOOK_LISTEN_PORT,

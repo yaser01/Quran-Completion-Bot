@@ -63,6 +63,7 @@ async def check_booked_parts_next_notification(context: ContextTypes.DEFAULT_TYP
 
 
 async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
+    print("Enterd")
     for i in range(1, 605):
         db_page_no = db.calc_file_id_with_page_no(page_no=i, book_id=QURAN_BOOK_ID.Hafs.value)
         if await db.get_quran_page_link(page_no=i, book_id=QURAN_BOOK_ID.Hafs.value) is None:
@@ -74,7 +75,7 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(4.5)
         else:
             logging.warning(f"Quran Page ({QURAN_BOOK_ID.Hafs.name},{i}) is already on DB.")
-
+    print("Enterd1")
     for i in range(1, 605):
         db_page_no = db.calc_file_id_with_page_no(page_no=i, book_id=QURAN_BOOK_ID.Hafs_with_tajwid.value)
         if await db.get_quran_page_link(page_no=i, book_id=QURAN_BOOK_ID.Hafs_with_tajwid.value) is None:
@@ -87,7 +88,7 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(4.5)
         else:
             logging.warning(f"Quran Page ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) is already on DB.")
-
+    print("Enterd2")
     for i in range(1, 31):
         db_chapter_no = db.calc_file_id_with_chapter_no(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs.value)
         if await db.get_quran_chapter_link(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs.value) is None:
@@ -105,7 +106,7 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(4.5)
         else:
             logging.warning(f"Quran Chapter ({QURAN_BOOK_ID.Hafs.name},{i}) is already on DB.")
-
+    print("Enterd3")
     for i in range(1, 31):
         db_chapter_no = db.calc_file_id_with_chapter_no(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs_with_tajwid.value)
         if await db.get_quran_chapter_link(chapter_no=i, book_id=QURAN_BOOK_ID.Hafs_with_tajwid.value) is None:
@@ -123,7 +124,9 @@ async def upload_quran_files(context: ContextTypes.DEFAULT_TYPE):
             await asyncio.sleep(4.5)
         else:
             logging.warning(f"Quran Chapter ({QURAN_BOOK_ID.Hafs_with_tajwid.name},{i}) is already on DB.")
+    print("Enterd4")
     await upload_about_image(context)
+    print("Enterd5")
 
 
 async def upload_about_image(context):
