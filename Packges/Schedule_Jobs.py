@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from telegram.ext import ContextTypes
 
 from Database import db
+from Packges.Brodcast import send_canceled_khatma_message_to_users, send_canceled_khatma_message_to_users_due_to_expired
 from Startup.Global_Files import Quran_Hafs_Pages_Images_Folder, Quran_Hafs_Tajwid_Pages_Images_Folder, \
     Quran_Hafs_Chapters_Folder, Quran_Hafs_Tajwid_Chapters_Folder, Resources_Folder
 from Packges.Global_Functions import QURAN_BOOK_ID, get_current_page_no_daily_page_quran, \
@@ -34,6 +35,12 @@ async def check_booked_parts_deadline(context: ContextTypes.DEFAULT_TYPE):
                                            parse_mode="MarkDownV2")
         except Exception as e:
             logging.error(e)
+
+
+async def check_expired_khatmas(context: ContextTypes.DEFAULT_TYPE):
+    expired_parts_khatmas = await db.cancel_of_all_expired_khatmas()
+    for expired_parts_khatma in expired_parts_khatmas:
+        await send_canceled_khatma_message_to_users_due_to_expired(parts_dict=expired_parts_khatma, context=context)
 
 
 async def check_booked_parts_next_notification(context: ContextTypes.DEFAULT_TYPE):

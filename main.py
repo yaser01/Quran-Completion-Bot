@@ -40,7 +40,7 @@ from Packges.MainMenu.new_khatma import new_khatma_confirmation_pressed, new_kha
     new_khatma_type_pressed
 from Packges.MainMenu.view_khatma import show_khatma_info, khatma_refresh_pressed, khatma_part_pressed
 from Packges.Schedule_Jobs import check_booked_parts_deadline, check_booked_parts_next_notification, \
-    upload_daily_quran_page_to_channel, upload_quran_files, backup_database_daily
+    upload_daily_quran_page_to_channel, upload_quran_files, backup_database_daily, check_expired_khatmas
 from Startup.CallBackData import CallBackData
 from Startup.Keyboards import Keyboards
 from Startup.KhatmaStatus import KhatmaStatus
@@ -234,6 +234,15 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                                                                                 text=khatma_info_request_message_text)
             context.user_data["khatma_info_request_message_id"] = khatma_info_request_message_object.id
             return
+        if int(duration) > 60:
+            logging.error(f"entered duration is not a big number ({duration})")
+            khatma_info_request_message_text = Text.Please_Enter_Duration_In_Days
+            khatma_info_request_message_text += "\n"
+            khatma_info_request_message_text += Text.Please_Enter_Not_Big_Duration_Number
+            khatma_info_request_message_object = await context.bot.send_message(chat_id=chat_id,
+                                                                                text=khatma_info_request_message_text)
+            context.user_data["khatma_info_request_message_id"] = khatma_info_request_message_object.id
+            return
         duration = int(duration)
         new_khatma_info_text = Text.create_new_khatma_info_with_all(name=opener_name,
                                                                     intention=intention,
@@ -303,6 +312,13 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             khatma_info_request_message_text = Text.Please_Enter_Correct_Number
             await context.bot.send_message(chat_id=chat_id,
                                            text=khatma_info_request_message_text)
+            return
+        if int(reading_part_duration) > 60:
+            logging.error(f"entered duration is not a big number ({reading_part_duration})")
+            khatma_info_request_message_text = Text.Please_Enter_Duration_In_Days
+            khatma_info_request_message_text += "\n"
+            khatma_info_request_message_text += Text.Please_Enter_Not_Big_Duration_Number
+            await context.bot.send_message(chat_id=chat_id,text=khatma_info_request_message_text)
             return
         reading_part_duration = int(reading_part_duration)
         khatma_id = int(context.user_data["khatma_id"])
@@ -469,9 +485,10 @@ def main():
                                                                  datetime.time(hour=8, minute=0,
                                                                                tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_daily_backup_to_drive = job_queue.run_daily(backup_database_daily,
-                                                                 datetime.time(hour=9, minute=0,
-                                                                               tzinfo=pytz.timezone('Asia/Baghdad')))
+                                                           datetime.time(hour=9, minute=0,
+                                                                         tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=1)
+    job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, when=2)
     application.run_webhook(
         listen=WEBHOOK_LISTEN_HOST,
         port=WEBHOOK_LISTEN_PORT,
@@ -488,6 +505,7 @@ def setup_startup_files():
         with open(Daily_Page_Quran_File, "a+", encoding="UTF-8") as f:
             data["page_no"] = 1
             json.dump(data, f)
+
 
 if __name__ == "__main__":
     logging.getLogger('apscheduler.executors.default').setLevel(logging.WARNING)

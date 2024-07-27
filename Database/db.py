@@ -686,6 +686,20 @@ async def mark_khatma_as_canceled_by_admin(khatma_id):
         return parts_dict
 
 
+async def cancel_of_all_expired_khatmas():
+    time_now = datetime.utcnow()
+    restrict_time = time_now - timedelta(days=210)
+    expired_khatmas = []
+    khatmas_parts_list = []
+    async with db_session() as session:
+        expired_khatmas = (await session.execute(select(Khatma).
+                                                 where(Khatma.time <= restrict_time))).scalars().all()
+    for expired_khatma in expired_khatmas:
+        parts_dict = await mark_khatma_as_canceled_by_admin(khatma_id=expired_khatma.id)
+        khatmas_parts_list.append(parts_dict)
+    return khatmas_parts_list
+
+
 init_database_logger()
 if __name__ == "__main__":
     asyncio.run(init_database())

@@ -786,6 +786,45 @@ class Text:
         return text
 
     @staticmethod
+    def create_canceled_khatma_text_for_user_due_to_expired(done_parts: List[PartData]):
+        text = escape_markdown_v2("")
+        text += " \n"
+        text += escape_markdown_v2("رقم الختمة: ")
+        text += "*"
+        text += get_text_copyable(str(done_parts[0].khatma_id))
+        text += "*"
+        text += "\n"
+        text += escape_markdown_v2("منشئ الختمة 👤: ")
+        text += escape_markdown_v2(str(done_parts[0].khatma_opener_name))
+        text += "\n"
+        text += escape_markdown_v2("النية 🤲🏻: ")
+        text += escape_markdown_v2(str(done_parts[0].khatma_intention))
+        text += "\n"
+        text += "*"
+        text += escape_markdown_v2("لقد تم إلغاء الختمة بسبب التقاعس عن القراءة لمدة طويلة (210 يوماً) ❌")
+        text += "*"
+        text += "\n"
+        text += escape_markdown_v2("جزاك الله خيراً في (إنهائك/مشاركتك في قراءة) الأجزاء التالية:")
+        text += "\n"
+        for done_part_id in range(len(done_parts)):
+            text += "*"
+            text += escape_markdown_v2(str(done_part_id + 1))
+            text += escape_markdown_v2("-")
+            text += " "
+            text += "الجزء "
+            text += escape_markdown_v2(part_no_dict_in_details[done_parts[done_part_id].part_no])
+            text += "*"
+            if done_part_id + 1 < len(done_parts):
+                text += "\n"
+        text += "\n"
+        text += escape_markdown_v2("جزاكم الله خيراً جميعاً")
+        text += "\n"
+        text += escape_markdown_v2("💚 اللهم ارحمنا بالقرآن وأجعله لنا إماماً ونوراً وهدًى ورحمة 💚")
+        text += "\n"
+        text += escape_markdown_v2("\u3000")
+        return text
+
+    @staticmethod
     def create_expired_khatma_part_text(khatma_id, part_no, khatma_opener_name, khatma_intention, khatma_part_duration):
         text = "*__"
         text += "للأسف تم إلغاء حجز الجزء "
@@ -969,6 +1008,7 @@ class Text:
     Please_Enter_New_Khatma_Type = "هل تود أن تصبح الختمة عامة أم خاصة؟"
     Please_Confirm_Information = "الرجاء التأكد من المعلومات قبل تأكيد فتح الختمة"
     Please_Enter_Correct_Number = "الرجاء إدخال قيمة عددية صحيحة"
+    Please_Enter_Not_Big_Duration_Number = "الرجاء إدخال قيمة عددية صحيحة (أقل من 60 يوماً)"
     Operation_Canceled = "تم إلغاء الأمر."
     New_Khatma_Started = "تم إنشاء الختمة بنجاح"
     Update_Khatma_Info_Done = "تم تعديل المعلومات بنجاح"

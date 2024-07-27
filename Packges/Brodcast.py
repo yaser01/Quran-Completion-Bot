@@ -52,3 +52,15 @@ async def send_canceled_khatma_message_to_users(parts_dict: dict, khatma_opener_
         except Exception as e:
             logging.error(e)
             await asyncio.sleep(0.3)
+
+
+async def send_canceled_khatma_message_to_users_due_to_expired(parts_dict: dict, context: ContextTypes.DEFAULT_TYPE):
+    user_ids = parts_dict.keys()
+    for user_id in user_ids:
+        try:
+            message_text = Text.create_canceled_khatma_text_for_user_due_to_expired(parts_dict[user_id])
+            await context.bot.send_message(chat_id=user_id, text=message_text, parse_mode=ParseMode.MARKDOWN_V2)
+            await asyncio.sleep(0.8)
+        except Exception as e:
+            logging.error(e)
+            await asyncio.sleep(0.3)
