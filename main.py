@@ -487,7 +487,7 @@ def main():
     job_upload_daily_backup_to_drive = job_queue.run_daily(backup_database_daily,
                                                            datetime.time(hour=9, minute=0,
                                                                          tzinfo=pytz.timezone('Asia/Baghdad')))
-    job_upload_quran_files = job_queue.run_once(upload_quran_files, when=1)
+    job_upload_quran_files = job_queue.run_once(upload_quran_files, when=5)
     job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, first=2)
     application.run_webhook(
         listen=WEBHOOK_LISTEN_HOST,
