@@ -19,6 +19,8 @@ async_engine = create_async_engine(build_async_db_uri(DATABASE_URI), echo=False)
 app = FastAPI()
 load_dotenv()
 Admin_Password = os.getenv('ADMIN_PAGE_PASSWORD')
+
+
 class AdminAuth(AuthenticationBackend):
     async def login(self, request: Request) -> bool:
         form = await request.form()
@@ -67,9 +69,10 @@ class UserAdmin(ModelView, model=User):
 class KhatmaAdmin(ModelView, model=Khatma):
     name = "Khatma"
     name_plural = "Khatmas"
-    column_list = [Khatma.id, Khatma.User,Khatma.user_id, Khatma.name_of_opener, Khatma.time, Khatma.description,
+    column_list = [Khatma.id, Khatma.User, Khatma.user_id, Khatma.name_of_opener, Khatma.time, Khatma.description,
                    Khatma.number_of_days_to_finish_a_part]
-    column_details_list = [Khatma.id, Khatma.User,Khatma.user_id, Khatma.name_of_opener, Khatma.time, Khatma.description,
+    column_details_list = [Khatma.id, Khatma.User, Khatma.user_id, Khatma.name_of_opener, Khatma.time,
+                           Khatma.description,
                            Khatma.number_of_days_to_finish_a_part]
     column_searchable_list = [Khatma.id, Khatma.user_id]
     column_export_list = [Khatma.id, Khatma.User, Khatma.name_of_opener, Khatma.time, Khatma.description,
