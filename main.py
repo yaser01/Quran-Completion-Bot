@@ -488,7 +488,7 @@ def main():
                                                            datetime.time(hour=9, minute=0,
                                                                          tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=5)
-    job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, first=2)
+    job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, first=3)
     application.run_webhook(
         listen=WEBHOOK_LISTEN_HOST,
         port=WEBHOOK_LISTEN_PORT,
