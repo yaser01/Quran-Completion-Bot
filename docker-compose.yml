@@ -1,0 +1,111 @@
+services:
+  quranbot_postgres:
+    image: postgres:16-alpine
+    container_name: quranbot_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      TZ: UTC
+    volumes:
+      - quranbot_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+    networks:
+      - quranbot_network
+
+  quranbot_bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: quranbot_bot:local
+    container_name: quranbot_bot
+    restart: unless-stopped
+    depends_on:
+      quranbot_postgres:
+        condition: service_healthy
+    environment:
+      BOT_TOKEN: ${BOT_TOKEN}
+      WEBHOOK_URL: ${WEBHOOK_URL}
+      WEBHOOK_LISTEN_HOST: 0.0.0.0
+      WEBHOOK_LISTEN_PORT: 8443
+      SECRET_TOKEN: ${SECRET_TOKEN}
+      PRIVATE_KEY: ${PRIVATE_KEY}
+      CERT: ${CERT}
+      DATABASE_URI: postgresql+asyncpg://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
+      DATABASE_BACKUP_URI: http://quranbot_backup:8001/backup_database
+      QURAN_FILES_CHANNEL_ID: ${QURAN_FILES_CHANNEL_ID}
+      QURAN_DAILY_PAGE_CHANNEL_ID: ${QURAN_DAILY_PAGE_CHANNEL_ID}
+      DB_HOST: quranbot_postgres
+      DATABASE_USER: ${DATABASE_USER}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - "./Secret Files:/app/Secret Files:ro"
+      - "./Resources:/app/Resources:ro"
+      - "./logs:/app/logs"
+      - quranbot_daily_page:/app/data
+    ports:
+      - "${WEBHOOK_LISTEN_PORT:-8443}:8443"
+    healthcheck:
+      test: ["CMD", "uv", "run", "python", "/app/docker/healthcheck.py"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - quranbot_network
+
+  quranbot_admin:
+    build:
+      context: .
+      dockerfile: Dockerfile.admin
+    image: quranbot_admin:local
+    container_name: quranbot_admin
+    restart: unless-stopped
+    depends_on:
+      quranbot_postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URI: postgresql+asyncpg://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
+      ADMIN_PAGE_PASSWORD: ${ADMIN_PAGE_PASSWORD}
+      ADMIN_SECRET_KEY: ${ADMIN_SECRET_KEY}
+    ports:
+      - "${ADMIN_PORT:-8002}:8002"
+    networks:
+      - quranbot_network
+
+  quranbot_backup:
+    build:
+      context: .
+      dockerfile: Dockerfile.backup
+    image: quranbot_backup:local
+    container_name: quranbot_backup
+    restart: unless-stopped
+    depends_on:
+      quranbot_postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URI: postgresql://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
+      BOT_TOKEN: ${BOT_TOKEN}
+      DEVELOPER_CHAT_ID: ${DEVELOPER_CHAT_ID}
+      GOOGLE_DRIVE_BACKUP_FOLDER_ID: ${GOOGLE_DRIVE_BACKUP_FOLDER_ID}
+    volumes:
+      - "./Secret Files:/app/Secret Files:ro"
+      - "./logs:/app/logs"
+    networks:
+      - quranbot_network
+
+networks:
+  quranbot_network:
+    name: quranbot_network
+    driver: bridge
+
+volumes:
+  quranbot_postgres_data:
+    name: quranbot_postgres_data
+  quranbot_daily_page:
+    name: quranbot_daily_page

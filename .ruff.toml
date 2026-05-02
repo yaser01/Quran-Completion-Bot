@@ -1,0 +1,23 @@
+line-length = 100
+target-version = "py312"
+
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "RUF", # ruff-specific
+]
+ignore = [
+    "E501",  # line too long — handled by formatter
+]
+
+[lint.per-file-ignores]
+"main.py" = ["E402"]                   # load_dotenv() before some imports is intentional
+"Database/Admin.py" = ["E402"]
+"Database/Backup_Database.py" = ["E402"]
+"Database/reset_db.py" = ["E402"]

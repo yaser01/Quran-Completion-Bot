@@ -1,0 +1,7 @@
+services:
+  quranbot_bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes:
+      - .:/app
