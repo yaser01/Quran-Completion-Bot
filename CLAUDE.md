@@ -13,8 +13,8 @@ automated reminders. Built on python-telegram-bot with async SQLAlchemy + Postgr
 This project runs 3 separate processes:
 
 1. **Bot** (`main.py`) — the Telegram bot itself (webhook, job queue)
-2. **Admin Panel** (`Database/Admin.py`) — sqladmin web UI at `ADMIN_PORT` (default 8002)
-3. **Backup Service** (`Database/Backup_Database.py`) — FastAPI app with `/backup_database` endpoint on port 8001
+2. **Admin Panel** (`db/Admin.py`) — sqladmin web UI at `ADMIN_PORT` (default 8002)
+3. **Backup Service** (`db/Backup_Database.py`) — FastAPI app with `/backup_database` endpoint on port 8001
 
 ## Run Locally
 
@@ -40,28 +40,30 @@ pre-commit run --all-files
 ```
 Quran-Completion-Bot/
 ├── main.py                      # Entrypoint: handler registration, job queue, webhook
-├── Database/
+├── db/
 │   ├── db.py                    # All async DB operations (SQLAlchemy + asyncpg)
 │   ├── models.py                # ORM models: User, Khatma, Khatma_Done, Khatma_Parts,
 │   │                            #              Khatma_Parts_Done, Quran_File
 │   ├── Admin.py                 # FastAPI + sqladmin admin panel (all 6 models)
 │   ├── Backup_Database.py       # FastAPI backup service (pg_dump → gzip → Google Drive)
-│   ├── MySqlFunc.py             # SQLAlchemy utcnow() compile extension
+│   ├── sql_functions.py         # SQLAlchemy utcnow() compile extension
 │   └── reset_db.py              # DESTRUCTIVE reset — manual use only, never from bot
-├── Packges/
+├── bot/
 │   ├── MainMenu/                # 8 handler modules, one per feature area
+│   ├── router.py                # Handler registration grouped by domain
+│   ├── state_dispatcher.py      # @register_state dispatch table
 │   ├── Brodcast.py              # Sends messages to all khatma participants on expiry/cancel
 │   ├── DriveManager.py          # Google Drive OAuth2 client (upload/delete/list)
 │   ├── Global_Functions.py      # 17 shared utilities (Arabic formatting, DB URI builder, etc.)
 │   └── Schedule_Jobs.py         # 5 background jobs (deadline checks, Quran uploads, backup)
-├── Startup/
+├── config/
 │   ├── CallBackData.py          # 50 callback data constants
 │   ├── UserStates.py            # State machine string constants
 │   ├── Keyboards.py             # Keyboard factory functions
 │   ├── Text.py                  # Arabic message template builders
 │   ├── Global_Files.py          # Centralized file path constants
 │   └── KhatmaPartStatus.py / KhatmaStatus.py / SurahsData.py
-├── Entites/                     # DTOs / value objects (ExpiredPart, NotificationPart, etc.)
+├── domain/                      # DTOs / value objects (ExpiredPart, NotificationPart, etc.)
 ├── data/                        # Runtime data — mounted as Docker volume
 │   └── Quran_Daily_Page.json    # Tracks which page was sent today (gitignored)
 └── Secret Files/                # OAuth credentials + TLS certs (gitignored)
@@ -74,13 +76,13 @@ Quran-Completion-Bot/
 ## Key Patterns
 
 - **State machine**: multi-step flows (new khatma, contribute, update) use string constants from
-  `Startup/UserStates.py` stored in `context.user_data["state"]`. The `message()` handler in
-  `main.py` dispatches based on the current state via a long `if/elif` chain.
+  `config/UserStates.py` stored in `context.user_data["state"]`. The `message()` handler in
+  `main.py` dispatches via `bot/state_dispatcher.py` `dispatch()` — no more `if/elif` chain.
 - **Callback routing**: `CallBackData` string constants are matched by PTB `CallbackQueryHandler`
-  pattern arguments registered in `main()`.
-- **DB access**: all DB operations are module-level async functions in `Database/db.py`, each
+  pattern arguments registered via `bot/router.py` `register_handlers()`.
+- **DB access**: all DB operations are module-level async functions in `db/db.py`, each
   using the `db_session()` async context manager. Never access the session from handlers directly.
-- **Quran file cache**: `TELEGRAM_FILES_IDS` dict in `db.py` caches Telegram file IDs in memory
+- **Quran file cache**: `TELEGRAM_FILES_IDS` dict in `db/db.py` caches Telegram file IDs in memory
   to avoid repeated DB reads. Populated lazily on first access per file.
 - **Scheduled jobs**: registered via `application.job_queue` in `main()`. The daily backup job
   calls the Backup Service over HTTP rather than running pg_dump in-process.
@@ -94,10 +96,10 @@ Required for the bot: `BOT_TOKEN`, `DATABASE_URI`, `QURAN_FILES_CHANNEL_ID`,
 
 ## Database Schema Reset
 
-Never call `Database/reset_db.py` from the bot. To reset the schema manually on the host:
+Never call `db/reset_db.py` from the bot. To reset the schema manually on the host:
 
 ```bash
-python -m Database.reset_db
+python -m db.reset_db
 ```
 
 This drops all tables and recreates them. All data is lost.
@@ -113,5 +115,8 @@ Verify `Secret Files/token.json` exists before building the Docker image.
 
 ## Testing
 
-No test suite yet. When adding tests, use pytest + pytest-asyncio. Highest-value targets:
-utility functions in `Packges/Global_Functions.py` and DB repository functions in `Database/db.py`.
+```bash
+uv run pytest tests/
+```
+
+Highest-value targets: utility functions in `bot/Global_Functions.py` and DB repository functions in `db/db.py`.

@@ -70,24 +70,25 @@ pre-commit run --all-files
 
 ```
 main.py                      # Bot entrypoint: handlers, job queue, webhook
-Database/
+db/
   db.py                      # All async DB operations (SQLAlchemy + asyncpg)
   models.py                  # ORM models (User, Khatma, Khatma_Parts, Quran_File, …)
   Admin.py                   # sqladmin web UI (port 8002)
   Backup_Database.py         # Backup service: pg_dump → gzip → Google Drive (port 8001)
   sql_functions.py           # SQLAlchemy utcnow() extension
   reset_db.py                # DESTRUCTIVE schema reset — manual use only
-Packges/
+bot/
   router.py                  # Handler registration grouped by domain
   state_dispatcher.py        # @register_state dispatch table
   MainMenu/                  # 8 handler modules (one per feature area)
   DriveManager.py            # Google Drive OAuth2 client
   Schedule_Jobs.py           # 5 background jobs
-Startup/
+config/
   UserStates.py              # State machine string constants
   CallBackData.py            # Callback data constants
   Keyboards.py               # Keyboard factory functions
   Text.py                    # Arabic message template builders
+domain/                      # DTOs / value objects (ExpiredPart, NotificationPart, …)
 docker/
   entrypoint.sh              # Waits for Postgres, then starts the service
   healthcheck.py             # SELECT 1 health probe for Docker
@@ -98,7 +99,7 @@ docker/
 Never run this from the bot. To reset the schema on the host:
 
 ```bash
-python -m Database.reset_db
+python -m db.reset_db
 ```
 
 All data is permanently deleted.
@@ -110,4 +111,4 @@ uv add --dev pytest pytest-asyncio
 uv run pytest tests/
 ```
 
-Highest-value targets: utility functions in `Packges/Global_Functions.py` and DB repository functions in `Database/db.py`.
+Highest-value targets: utility functions in `bot/Global_Functions.py` and DB repository functions in `db/db.py`.
