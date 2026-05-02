@@ -15,10 +15,9 @@ from telegram.ext import Application, ContextTypes
 from telegram.request import HTTPXRequest
 
 from db import db
-from botimport state_dispatcher
+from bot import state_dispatcher
 from config.Global_Files import Daily_Page_Quran_File, Logs_Folder
 from bot.Global_Functions import get_user_object_date_from_update_object
-from bot.MainMenu.main_menu import main_menu, start
 from bot.MainMenu.view_khatma import show_khatma_info
 from bot.Schedule_Jobs import check_booked_parts_deadline, check_booked_parts_next_notification, \
     upload_daily_quran_page_to_channel, upload_quran_files, backup_database_daily, check_expired_khatmas
