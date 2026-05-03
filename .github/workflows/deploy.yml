@@ -1,0 +1,66 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Reconstruct Secret Files
+        run: |
+          mkdir -p "Secret Files"
+          echo "${{ secrets.SECRET_FILE_DEVELOPER_CREDENTIALS_JSON }}" | base64 -d > "Secret Files/developer_credentials.json"
+          echo "${{ secrets.SECRET_FILE_DEVELOPER_TOKEN_JSON }}" | base64 -d > "Secret Files/developer_token.json"
+          echo "${{ secrets.SECRET_FILE_PRIVKEY_PEM }}" | base64 -d > "Secret Files/privkey.pem"
+          echo "${{ secrets.SECRET_FILE_CERT_PEM }}" | base64 -d > "Secret Files/cert.pem"
+
+      - name: Write .env
+        env:
+          BOT_TOKEN: ${{ secrets.ENV_BOT_TOKEN }}
+          WEBHOOK_URL: ${{ secrets.ENV_WEBHOOK_URL }}
+          SECRET_TOKEN: ${{ secrets.ENV_SECRET_TOKEN }}
+          QURAN_FILES_CHANNEL_ID: ${{ secrets.ENV_QURAN_FILES_CHANNEL_ID }}
+          QURAN_DAILY_PAGE_CHANNEL_ID: ${{ secrets.ENV_QURAN_DAILY_PAGE_CHANNEL_ID }}
+          DEVELOPER_CHAT_ID: ${{ secrets.ENV_DEVELOPER_CHAT_ID }}
+          GOOGLE_DRIVE_BACKUP_FOLDER_ID: ${{ secrets.ENV_GOOGLE_DRIVE_BACKUP_FOLDER_ID }}
+          ADMIN_PAGE_PASSWORD: ${{ secrets.ENV_ADMIN_PAGE_PASSWORD }}
+          ADMIN_SECRET_KEY: ${{ secrets.ENV_ADMIN_SECRET_KEY }}
+          POSTGRES_DB: ${{ secrets.ENV_POSTGRES_DB }}
+          DATABASE_USER: ${{ secrets.ENV_DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
+        run: |
+          {
+            echo "APP_ENV=prod"
+            echo "BOT_TOKEN=${BOT_TOKEN}"
+            echo "WEBHOOK_URL=${WEBHOOK_URL}"
+            echo "WEBHOOK_LISTEN_HOST=0.0.0.0"
+            echo "WEBHOOK_LISTEN_PORT=8443"
+            echo "SECRET_TOKEN=${SECRET_TOKEN}"
+            echo "PRIVATE_KEY=/app/Secret Files/privkey.pem"
+            echo "CERT=/app/Secret Files/cert.pem"
+            echo "QURAN_FILES_CHANNEL_ID=${QURAN_FILES_CHANNEL_ID}"
+            echo "QURAN_DAILY_PAGE_CHANNEL_ID=${QURAN_DAILY_PAGE_CHANNEL_ID}"
+            echo "DATABASE_BACKUP_URI=http://quranbot_backup:8001/backup_database"
+            echo "DEVELOPER_CHAT_ID=${DEVELOPER_CHAT_ID}"
+            echo "GOOGLE_DRIVE_BACKUP_FOLDER_ID=${GOOGLE_DRIVE_BACKUP_FOLDER_ID}"
+            echo "ENABLE_DRIVE_BACKUP=1"
+            echo "ADMIN_PAGE_PASSWORD=${ADMIN_PAGE_PASSWORD}"
+            echo "ADMIN_SECRET_KEY=${ADMIN_SECRET_KEY}"
+            echo "ADMIN_PORT=8002"
+            echo "POSTGRES_DB=${POSTGRES_DB}"
+            echo "DATABASE_USER=${DATABASE_USER}"
+            echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}"
+            echo "DB_HOST=quranbot_postgres"
+          } > .env
+
+      - name: Deploy
+        run: docker compose -f docker-compose.yml up --build -d
+
+      - name: Prune old images
+        run: docker image prune -f
