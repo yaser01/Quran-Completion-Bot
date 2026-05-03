@@ -7,18 +7,27 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
+    concurrency:
+      group: deploy-prod
+      cancel-in-progress: false
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Reconstruct Secret Files
+        env:
+          DEV_CREDS: ${{ secrets.SECRET_FILE_DEVELOPER_CREDENTIALS_JSON }}
+          DEV_TOKEN: ${{ secrets.SECRET_FILE_DEVELOPER_TOKEN_JSON }}
+          PRIVKEY: ${{ secrets.SECRET_FILE_PRIVKEY_PEM }}
+          CERT: ${{ secrets.SECRET_FILE_CERT_PEM }}
         run: |
+          set -euo pipefail
           mkdir -p "Secret Files"
-          echo "${{ secrets.SECRET_FILE_DEVELOPER_CREDENTIALS_JSON }}" | base64 -d > "Secret Files/developer_credentials.json"
-          echo "${{ secrets.SECRET_FILE_DEVELOPER_TOKEN_JSON }}" | base64 -d > "Secret Files/developer_token.json"
-          echo "${{ secrets.SECRET_FILE_PRIVKEY_PEM }}" | base64 -d > "Secret Files/privkey.pem"
-          echo "${{ secrets.SECRET_FILE_CERT_PEM }}" | base64 -d > "Secret Files/cert.pem"
+          printf '%s' "$DEV_CREDS" | base64 -d > "Secret Files/developer_credentials.json"
+          printf '%s' "$DEV_TOKEN" | base64 -d > "Secret Files/developer_token.json"
+          printf '%s' "$PRIVKEY"   | base64 -d > "Secret Files/privkey.pem"
+          printf '%s' "$CERT"      | base64 -d > "Secret Files/cert.pem"
 
       - name: Write .env
         env:
@@ -35,13 +44,14 @@ jobs:
           DATABASE_USER: ${{ secrets.ENV_DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.ENV_DATABASE_PASSWORD }}
         run: |
+          set -euo pipefail
           {
             echo "APP_ENV=prod"
-            echo "BOT_TOKEN=${BOT_TOKEN}"
-            echo "WEBHOOK_URL=${WEBHOOK_URL}"
+            printf '%s\n' "BOT_TOKEN=$BOT_TOKEN"
+            printf '%s\n' "WEBHOOK_URL=$WEBHOOK_URL"
             echo "WEBHOOK_LISTEN_HOST=0.0.0.0"
             echo "WEBHOOK_LISTEN_PORT=8443"
-            echo "SECRET_TOKEN=${SECRET_TOKEN}"
+            printf '%s\n' "SECRET_TOKEN=$SECRET_TOKEN"
             echo "PRIVATE_KEY=/app/Secret Files/privkey.pem"
             echo "CERT=/app/Secret Files/cert.pem"
             echo "QURAN_FILES_CHANNEL_ID=${QURAN_FILES_CHANNEL_ID}"
@@ -50,17 +60,17 @@ jobs:
             echo "DEVELOPER_CHAT_ID=${DEVELOPER_CHAT_ID}"
             echo "GOOGLE_DRIVE_BACKUP_FOLDER_ID=${GOOGLE_DRIVE_BACKUP_FOLDER_ID}"
             echo "ENABLE_DRIVE_BACKUP=1"
-            echo "ADMIN_PAGE_PASSWORD=${ADMIN_PAGE_PASSWORD}"
-            echo "ADMIN_SECRET_KEY=${ADMIN_SECRET_KEY}"
+            printf '%s\n' "ADMIN_PAGE_PASSWORD=$ADMIN_PAGE_PASSWORD"
+            printf '%s\n' "ADMIN_SECRET_KEY=$ADMIN_SECRET_KEY"
             echo "ADMIN_PORT=8002"
             echo "POSTGRES_DB=${POSTGRES_DB}"
             echo "DATABASE_USER=${DATABASE_USER}"
-            echo "DATABASE_PASSWORD=${DATABASE_PASSWORD}"
+            printf '%s\n' "DATABASE_PASSWORD=$DATABASE_PASSWORD"
             echo "DB_HOST=quranbot_postgres"
           } > .env
 
-      - name: Deploy
-        run: docker compose -f docker-compose.yml up --build -d
+      - name: Build and start services
+        run: docker compose -f docker-compose.yml up --build -d --wait
 
       - name: Prune old images
         run: docker image prune -f
