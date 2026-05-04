@@ -74,6 +74,8 @@ services:
       DATABASE_URI: postgresql+asyncpg://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
       ADMIN_PAGE_PASSWORD: ${ADMIN_PAGE_PASSWORD}
       ADMIN_SECRET_KEY: ${ADMIN_SECRET_KEY}
+    volumes:
+      - "./logs:/app/logs"
     ports:
       - "${ADMIN_PORT:-8002}:8002"
     networks:
