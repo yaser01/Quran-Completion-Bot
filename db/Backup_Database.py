@@ -20,7 +20,8 @@ DEVELOPER_CHAT_ID = os.getenv('DEVELOPER_CHAT_ID')
 ADMIN_BOT_TOKEN = os.getenv('BOT_TOKEN')
 Admin_Bot = telegram.Bot(token=ADMIN_BOT_TOKEN)
 GOOGLE_DRIVE_BACKUP_FOLDER_ID = os.getenv('GOOGLE_DRIVE_BACKUP_FOLDER_ID')
-drive_manager = DriveManager()
+ENABLE_DRIVE_BACKUP = os.getenv('ENABLE_DRIVE_BACKUP', '0') == '1'
+drive_manager = DriveManager() if ENABLE_DRIVE_BACKUP else None
 BACKUPS_LIMIT = 50
 backups_files_ids: list[str] = []
 
@@ -41,8 +42,9 @@ logging.basicConfig(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global backups_files_ids
-    backups_files_ids = drive_manager.list_files(folder_id=GOOGLE_DRIVE_BACKUP_FOLDER_ID)
-    logging.info(f"Loaded {len(backups_files_ids)} existing backup file IDs from Drive")
+    if drive_manager:
+        backups_files_ids = drive_manager.list_files(folder_id=GOOGLE_DRIVE_BACKUP_FOLDER_ID)
+        logging.info(f"Loaded {len(backups_files_ids)} existing backup file IDs from Drive")
     yield
 
 
@@ -56,14 +58,15 @@ async def backup_database():
             datetime.now().strftime("%Y_%m_%d_%H_%M_%S")) + ".gz"
         file_name = Path(file_path).name
         os.system(f"pg_dump --dbname={DATABASE_URI} | gzip -9 > \"{file_path}\"")
-        new_file_id = drive_manager.upload_file(file_name=file_name, file_path=file_path,
-                                                folder_drive_id=GOOGLE_DRIVE_BACKUP_FOLDER_ID)
         file_size = os.path.getsize(Path(file_path))
+        if drive_manager:
+            new_file_id = drive_manager.upload_file(file_name=file_name, file_path=file_path,
+                                                    folder_drive_id=GOOGLE_DRIVE_BACKUP_FOLDER_ID)
+            backups_files_ids.append(new_file_id)
+            if len(backups_files_ids) > BACKUPS_LIMIT:
+                oldest_file_id = backups_files_ids.pop(0)
+                drive_manager.delete_file(oldest_file_id)
         os.remove(Path(file_path))
-        backups_files_ids.append(new_file_id)
-        if len(backups_files_ids) > BACKUPS_LIMIT:
-            oldest_file_id = backups_files_ids.pop(0)
-            drive_manager.delete_file(oldest_file_id)
         logging.info(f"Upload file: '{file_name}' with size: [{round(file_size / (1024 * 1024), 2)} MB] Succeeded")
     except Exception as e:
         logging.error(e)

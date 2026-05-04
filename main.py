@@ -25,6 +25,7 @@ from bot.router import register_handlers
 from config.Text import Text
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
+APP_ENV = os.getenv('APP_ENV', 'dev')
 WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 WEBHOOK_LISTEN_HOST = os.getenv('WEBHOOK_LISTEN_HOST')
 WEBHOOK_LISTEN_PORT = os.getenv('WEBHOOK_LISTEN_PORT')
@@ -74,14 +75,17 @@ def main():
                                                                          tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=5)
     job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, first=3)
-    application.run_webhook(
-        listen=WEBHOOK_LISTEN_HOST,
-        port=WEBHOOK_LISTEN_PORT,
-        secret_token=SECRET_TOKEN,
-        key=PRIVATE_KEY,
-        cert=CERT,
-        webhook_url=WEBHOOK_URL
-    )
+    if APP_ENV == 'prod':
+        application.run_webhook(
+            listen=WEBHOOK_LISTEN_HOST,
+            port=WEBHOOK_LISTEN_PORT,
+            secret_token=SECRET_TOKEN,
+            key=PRIVATE_KEY,
+            cert=CERT,
+            webhook_url=WEBHOOK_URL
+        )
+    else:
+        application.run_polling()
 
 
 def setup_startup_files():

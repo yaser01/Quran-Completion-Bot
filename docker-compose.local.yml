@@ -30,6 +30,7 @@ services:
         condition: service_healthy
     env_file: .env
     environment:
+      APP_ENV: dev
       WEBHOOK_LISTEN_HOST: 0.0.0.0
       WEBHOOK_LISTEN_PORT: 8443
       DATABASE_URI: postgresql+asyncpg://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
@@ -58,6 +59,8 @@ services:
     env_file: .env
     environment:
       DATABASE_URI: postgresql+asyncpg://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
+    volumes:
+      - "./logs:/app/logs"
     ports:
       - "${ADMIN_PORT:-8002}:8002"
     networks:
