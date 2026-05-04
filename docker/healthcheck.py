@@ -1,12 +1,18 @@
+import asyncio
 import os
 import sys
-from sqlalchemy import create_engine, text
+
+
+async def check():
+    import asyncpg
+    dsn = os.environ["DATABASE_URI"].replace("postgresql+asyncpg://", "postgresql://")
+    conn = await asyncpg.connect(dsn)
+    await conn.execute("SELECT 1")
+    await conn.close()
+
 
 try:
-    uri = os.environ["DATABASE_URI"].replace("+asyncpg", "")
-    engine = create_engine(uri)
-    with engine.connect() as conn:
-        conn.execute(text("SELECT 1"))
+    asyncio.run(check())
     sys.exit(0)
 except Exception as e:
     print(f"Health check failed: {e}", file=sys.stderr)
