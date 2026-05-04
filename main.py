@@ -76,9 +76,11 @@ def main():
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=5)
     job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, first=3)
     if APP_ENV == 'prod':
+        from urllib.parse import urlparse
         application.run_webhook(
             listen=WEBHOOK_LISTEN_HOST,
             port=WEBHOOK_LISTEN_PORT,
+            url_path=urlparse(WEBHOOK_URL).path,
             secret_token=SECRET_TOKEN,
             key=PRIVATE_KEY,
             cert=CERT,
