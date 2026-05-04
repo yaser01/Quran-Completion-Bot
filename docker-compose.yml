@@ -96,8 +96,9 @@ services:
       BOT_TOKEN: ${BOT_TOKEN}
       DEVELOPER_CHAT_ID: ${DEVELOPER_CHAT_ID}
       GOOGLE_DRIVE_BACKUP_FOLDER_ID: ${GOOGLE_DRIVE_BACKUP_FOLDER_ID}
+      ENABLE_DRIVE_BACKUP: ${ENABLE_DRIVE_BACKUP}
     volumes:
-      - "./Secret Files:/app/Secret Files:ro"
+      - "./Secret Files:/app/Secret Files"
       - "./logs:/app/logs"
     networks:
       - quranbot_network
