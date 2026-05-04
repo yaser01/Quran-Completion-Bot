@@ -13,6 +13,7 @@ dependencies = [
     "pytz>=2026.1.post1",
     "sqladmin>=0.25.0",
     "sqlalchemy~=2.0.30",
+    "itsdangerous>=2.2.0",
     "uvicorn>=0.34.0",
 ]
 
