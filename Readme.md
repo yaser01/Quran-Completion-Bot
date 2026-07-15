@@ -4,7 +4,7 @@ A Telegram bot for collaborative Quran completion circles (Khatma). Users create
 
 Live bot: [Quran Completion Bot](https://t.me/QuranCompletionBot)
 
-Built in Python ❤️.
+Built in Python ❤️
 
 ---
 
