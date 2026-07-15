@@ -26,6 +26,7 @@ from config.Text import Text
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 APP_ENV = os.getenv('APP_ENV', 'dev')
+USE_WEBHOOK = os.getenv('USE_WEBHOOK', '0') == '1'
 WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 WEBHOOK_LISTEN_HOST = os.getenv('WEBHOOK_LISTEN_HOST')
 WEBHOOK_LISTEN_PORT = os.getenv('WEBHOOK_LISTEN_PORT')
@@ -75,7 +76,7 @@ def main():
                                                                          tzinfo=pytz.timezone('Asia/Baghdad')))
     job_upload_quran_files = job_queue.run_once(upload_quran_files, when=5)
     job_check_expired_khatmas = job_queue.run_repeating(check_expired_khatmas, interval=60 * 60 * 24 * 7, first=3)
-    if APP_ENV == 'prod':
+    if APP_ENV == 'prod' and USE_WEBHOOK:
         from urllib.parse import urlparse
         application.run_webhook(
             listen=WEBHOOK_LISTEN_HOST,

@@ -46,17 +46,24 @@ Copy `.env.example` and fill in the required values:
 | Variable | Description |
 |---|---|
 | `BOT_TOKEN` | Telegram bot token from @BotFather |
-| `WEBHOOK_URL` | Public HTTPS URL for the webhook (e.g. `https://1.2.3.4:8443`) |
 | `DATABASE_URI` | Full PostgreSQL URI (asyncpg format) |
 | `QURAN_FILES_CHANNEL_ID` | Telegram channel ID storing Quran file assets |
 | `QURAN_DAILY_PAGE_CHANNEL_ID` | Channel ID for daily page posts |
-| `SECRET_TOKEN` | Webhook secret token |
-| `PRIVATE_KEY` | Path to TLS private key file |
-| `CERT` | Path to TLS certificate file |
 | `ADMIN_PAGE_PASSWORD` | Password for the sqladmin web UI |
 | `ADMIN_SECRET_KEY` | Secret key for admin session cookies |
 | `DEVELOPER_CHAT_ID` | Telegram chat ID to receive backup notifications |
 | `GOOGLE_DRIVE_BACKUP_FOLDER_ID` | Google Drive folder ID for database backups |
+| `USE_WEBHOOK` | (webhook mode only) Set to `1` to use a webhook instead of polling |
+| `WEBHOOK_URL` | (webhook mode only) Public HTTPS URL for the webhook (e.g. `https://1.2.3.4:8443`) |
+| `SECRET_TOKEN` | (webhook mode only) Webhook secret token |
+| `PRIVATE_KEY` | (webhook mode only) Path to TLS private key file |
+| `CERT` | (webhook mode only) Path to TLS certificate file |
+
+The bot uses long-polling by default in every environment — no inbound port or TLS
+cert is required. To switch a production deploy to a webhook instead: set
+`USE_WEBHOOK=1` and `APP_ENV=prod`, fill in `WEBHOOK_URL`/`SECRET_TOKEN`/`PRIVATE_KEY`/
+`CERT`, re-add the `8443` port mapping to `docker-compose.yml`, and restore the
+`Secret Files/privkey.pem` + `cert.pem` provisioning in `.github/workflows/deploy.yml`.
 
 ## Lint & Format
 

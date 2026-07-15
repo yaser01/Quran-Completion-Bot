@@ -23,21 +23,15 @@ jobs:
         env:
           DEV_CREDS: ${{ secrets.SECRET_FILE_DEVELOPER_CREDENTIALS_JSON }}
           DEV_TOKEN: ${{ secrets.SECRET_FILE_DEVELOPER_TOKEN_JSON }}
-          PRIVKEY: ${{ secrets.SECRET_FILE_PRIVKEY_PEM }}
-          CERT: ${{ secrets.SECRET_FILE_CERT_PEM }}
         run: |
           set -euo pipefail
           mkdir -p "Secret Files"
           printf '%s' "$DEV_CREDS" | base64 -d > "Secret Files/developer_credentials.json"
           printf '%s' "$DEV_TOKEN" | base64 -d > "Secret Files/developer_token.json"
-          printf '%s' "$PRIVKEY"   | base64 -d > "Secret Files/privkey.pem"
-          printf '%s' "$CERT"      | base64 -d > "Secret Files/cert.pem"
 
       - name: Write .env
         env:
           BOT_TOKEN: ${{ secrets.ENV_BOT_TOKEN }}
-          WEBHOOK_URL: ${{ secrets.ENV_WEBHOOK_URL }}
-          SECRET_TOKEN: ${{ secrets.ENV_SECRET_TOKEN }}
           QURAN_FILES_CHANNEL_ID: ${{ secrets.ENV_QURAN_FILES_CHANNEL_ID }}
           QURAN_DAILY_PAGE_CHANNEL_ID: ${{ secrets.ENV_QURAN_DAILY_PAGE_CHANNEL_ID }}
           DEVELOPER_CHAT_ID: ${{ secrets.ENV_DEVELOPER_CHAT_ID }}
@@ -52,12 +46,6 @@ jobs:
           {
             echo "APP_ENV=prod"
             printf '%s\n' "BOT_TOKEN=$BOT_TOKEN"
-            printf '%s\n' "WEBHOOK_URL=$WEBHOOK_URL"
-            echo "WEBHOOK_LISTEN_HOST=0.0.0.0"
-            echo "WEBHOOK_LISTEN_PORT=8443"
-            printf '%s\n' "SECRET_TOKEN=$SECRET_TOKEN"
-            echo "PRIVATE_KEY=/app/Secret Files/privkey.pem"
-            echo "CERT=/app/Secret Files/cert.pem"
             echo "QURAN_FILES_CHANNEL_ID=${QURAN_FILES_CHANNEL_ID}"
             echo "QURAN_DAILY_PAGE_CHANNEL_ID=${QURAN_DAILY_PAGE_CHANNEL_ID}"
             echo "DATABASE_BACKUP_URI=http://quranbot_backup:8001/backup_database"

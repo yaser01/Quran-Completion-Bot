@@ -92,7 +92,12 @@ Quran-Completion-Bot/
 See `.env.example` for the full list with descriptions.
 
 Required for the bot: `BOT_TOKEN`, `DATABASE_URI`, `QURAN_FILES_CHANNEL_ID`,
-`QURAN_DAILY_PAGE_CHANNEL_ID`, `WEBHOOK_URL`, `WEBHOOK_LISTEN_HOST`, `WEBHOOK_LISTEN_PORT`.
+`QURAN_DAILY_PAGE_CHANNEL_ID`.
+
+The bot uses long-polling by default in both dev and prod. Set `USE_WEBHOOK=1`
+(with `APP_ENV=prod`) to switch to a webhook instead — see `.env.example` for the
+webhook-only variables (`WEBHOOK_URL`, `WEBHOOK_LISTEN_HOST`, `WEBHOOK_LISTEN_PORT`,
+`SECRET_TOKEN`, `PRIVATE_KEY`, `CERT`).
 
 ## Database Schema Reset
 

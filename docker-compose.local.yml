@@ -31,8 +31,6 @@ services:
     env_file: .env
     environment:
       APP_ENV: dev
-      WEBHOOK_LISTEN_HOST: 0.0.0.0
-      WEBHOOK_LISTEN_PORT: 8443
       DATABASE_URI: postgresql+asyncpg://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
       DATABASE_BACKUP_URI: http://quranbot_backup:8001/backup_database
       DB_HOST: quranbot_postgres
@@ -42,8 +40,6 @@ services:
       - "./Resources:/app/Resources:ro"
       - "./logs:/app/logs"
       - quranbot_daily_page:/app/data
-    ports:
-      - "${WEBHOOK_LISTEN_PORT:-8443}:8443"
     networks:
       - quranbot_network
 

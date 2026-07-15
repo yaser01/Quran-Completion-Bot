@@ -31,12 +31,6 @@ services:
     environment:
       APP_ENV: prod
       BOT_TOKEN: ${BOT_TOKEN}
-      WEBHOOK_URL: ${WEBHOOK_URL}
-      WEBHOOK_LISTEN_HOST: 0.0.0.0
-      WEBHOOK_LISTEN_PORT: 8443
-      SECRET_TOKEN: ${SECRET_TOKEN}
-      PRIVATE_KEY: ${PRIVATE_KEY}
-      CERT: ${CERT}
       DATABASE_URI: postgresql+asyncpg://${DATABASE_USER}:${DATABASE_PASSWORD}@quranbot_postgres:5432/${POSTGRES_DB}
       DATABASE_BACKUP_URI: http://quranbot_backup:8001/backup_database
       QURAN_FILES_CHANNEL_ID: ${QURAN_FILES_CHANNEL_ID}
@@ -49,8 +43,6 @@ services:
       - "./Resources:/app/Resources:ro"
       - "./logs:/app/logs"
       - quranbot_daily_page:/app/data
-    ports:
-      - "${WEBHOOK_LISTEN_PORT:-8443}:8443"
     healthcheck:
       test: ["CMD", "uv", "run", "python", "/app/docker/healthcheck.py"]
       interval: 30s
