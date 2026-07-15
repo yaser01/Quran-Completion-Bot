@@ -7,6 +7,7 @@ Secret_Folder = os.path.join(os.path.abspath(Script_Folder), Path('Secret Files'
 Backup_File_Prefix = os.path.join(Script_Folder, "Backup")
 Logs_Folder = os.path.join(os.path.abspath(Script_Folder), Path('logs'))
 Resources_Folder = os.path.join(os.path.abspath(Script_Folder), Path('Resources'))
+About_Image_File = os.path.join(os.path.abspath(Resources_Folder), Path('about.jpg'))
 Quran_Images_Arabic_Folder = os.path.join(os.path.abspath(Resources_Folder), Path('Quran Images Arabic'))
 Quran_PDF_Arabic_Folder = os.path.join(os.path.abspath(Resources_Folder), Path('Quran PDF Arabic'))
 Quran_Hafs_Pages_Images_Folder = os.path.join(os.path.abspath(Quran_Images_Arabic_Folder), Path('Hafs'))
